@@ -39,8 +39,6 @@
             <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
-
-
     </dependencies>
 
     <build>
@@ -55,6 +53,7 @@
                 </configuration>
             </plugin>
 
+            <!-- Install desktop-game-engine to local repo -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-install-plugin</artifactId>
@@ -76,6 +75,8 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Copy dependencies to target/classes/lib -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -88,12 +89,14 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <outputDirectory>${project.build.outputDirectory}/lib</outputDirectory>
                             <includeScope>compile</includeScope>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Create executable JAR with JarRsrcLoader -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -107,11 +110,13 @@
                         <manifestEntries>
                             <Rsrc-Main-Class>com.javarush.games.racer.RacerGame</Rsrc-Main-Class>
                             <Class-Path>.</Class-Path>
-                            <Rsrc-Class-Path>./ lib/commons-lang3-3.12.0.jar lib/javafx-controls-18.0.1.jar lib/desktop-game-engine-1.0.jar</Rsrc-Class-Path>
+                            <Rsrc-Class-Path>lib/commons-lang3-3.18.0.jar lib/desktop-game-engine-1.0.jar lib/javafx-base-18.0.1-mac.jar lib/javafx-controls-18.0.1-mac.jar lib/javafx-graphics-18.0.1-mac.jar</Rsrc-Class-Path>
                         </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
+
+            <!-- Surefire: exclude StrangeTest -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -123,7 +128,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Run java-fx app over Maven -->
+            <!-- Run JavaFX app via Maven -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
@@ -133,12 +138,5 @@
                 </configuration>
             </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>${project.build.directory}/lib</directory>
-                <targetPath>lib</targetPath>
-            </resource>
-        </resources>
     </build>
-
 </project>
