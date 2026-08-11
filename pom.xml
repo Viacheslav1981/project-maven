@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>jru.module3</groupId>
@@ -14,36 +16,59 @@
     </properties>
 
     <dependencies>
-        <!-- Source: https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+
+        <!-- Apache Commons Lang -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.18.0</version>
-            <scope>compile</scope>
+            <version>3.12.0</version>
         </dependency>
-        <!-- Source: https://mvnrepository.com/artifact/org.openjfx/javafx-controls -->
+
+        <!-- JavaFX -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>18.0.1</version>
-            <scope>compile</scope>
         </dependency>
+
+        <!-- JavaRush Desktop Game Engine -->
         <dependency>
             <groupId>com.javarush</groupId>
             <artifactId>desktop-game-engine</artifactId>
             <version>1.0</version>
         </dependency>
+
+        <!-- JUnit -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>
+
+        <!--
+            Копируем собранные зависимости как ресурсы.
+            В результате они попадут внутрь JAR в папку lib/
+        -->
+        <resources>
+            <resource>
+                <directory>${project.build.outputDirectory}</directory>
+                <includes>
+                    <include>lib/**</include>
+                </includes>
+            </resource>
+        </resources>
+
         <plugins>
-            <!-- Usual compilation -->
+
+            <!--
+                Maven Compiler Plugin.
+                По условию задания оставляем без изменений.
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -53,20 +78,29 @@
                 </configuration>
             </plugin>
 
-            <!-- Install desktop-game-engine to local repo -->
+            <!--
+                Устанавливаем desktop-game-engine-1.0.jar
+                из папки lib в локальный Maven repository.
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-install-plugin</artifactId>
                 <version>3.1.0</version>
+
                 <executions>
                     <execution>
                         <id>install-desktop-game-engine</id>
                         <phase>initialize</phase>
+
                         <goals>
                             <goal>install-file</goal>
                         </goals>
+
                         <configuration>
-                            <file>${project.basedir}/lib/desktop-game-engine-1.0.jar</file>
+                            <file>
+                                ${project.basedir}/lib/desktop-game-engine-1.0.jar
+                            </file>
+
                             <groupId>com.javarush</groupId>
                             <artifactId>desktop-game-engine</artifactId>
                             <version>1.0</version>
@@ -76,51 +110,82 @@
                 </executions>
             </plugin>
 
-            <!-- Copy dependencies to target/classes/lib -->
+            <!--
+                Копируем compile-зависимости в target/classes/lib.
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>3.4.0</version>
+
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
                         <phase>prepare-package</phase>
+
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>
+
                         <configuration>
-                            <outputDirectory>${project.build.outputDirectory}/lib</outputDirectory>
+                            <outputDirectory>
+                                ${project.build.outputDirectory}/lib
+                            </outputDirectory>
+
                             <includeScope>compile</includeScope>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
 
-            <!-- Create executable JAR with JarRsrcLoader -->
+            <!--
+                Создаём исполняемый JAR.
+
+                Main-Class:
+                специальный загрузчик JavaRush.
+
+                Rsrc-Main-Class:
+                настоящий стартовый класс игры.
+
+                Class-Path:
+                зависимости находятся внутри JAR в папке lib/.
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.3.0</version>
+
                 <configuration>
                     <archive>
                         <manifest>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader</mainClass>
+                            <addClasspath>false</addClasspath>
+                            <mainClass>
+                                org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader
+                            </mainClass>
                         </manifest>
+
                         <manifestEntries>
-                            <Rsrc-Main-Class>com.javarush.games.racer.RacerGame</Rsrc-Main-Class>
-                            <Class-Path>.</Class-Path>
-                            <Rsrc-Class-Path>lib/commons-lang3-3.18.0.jar lib/desktop-game-engine-1.0.jar lib/javafx-base-18.0.1-mac.jar lib/javafx-controls-18.0.1-mac.jar lib/javafx-graphics-18.0.1-mac.jar</Rsrc-Class-Path>
+                            <Class-Path>
+                                ./ lib/commons-lang3-3.12.0.jar lib/desktop-game-engine-1.0.jar lib/javafx-base-18.0.1-mac.jar lib/javafx-controls-18.0.1-mac.jar lib/javafx-graphics-18.0.1-mac.jar
+                            </Class-Path>
+
+                            <Rsrc-Main-Class>
+                                com.javarush.games.racer.RacerGame
+                            </Rsrc-Main-Class>
                         </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
 
-            <!-- Surefire: exclude StrangeTest -->
+            <!--
+                Не запускаем StrangeTest.
+                Все остальные тесты запускаются.
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M9</version>
+
                 <configuration>
                     <excludes>
                         <exclude>**/StrangeTest.java</exclude>
@@ -128,15 +193,24 @@
                 </configuration>
             </plugin>
 
-            <!-- Run JavaFX app via Maven -->
+            <!--
+                Позволяет запускать игру через:
+                mvn javafx:run
+            -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
+
                 <configuration>
-                    <mainClass>com.javarush.games.racer.RacerGame</mainClass>
+                    <mainClass>
+                        com.javarush.games.racer.RacerGame
+                    </mainClass>
                 </configuration>
             </plugin>
+
         </plugins>
+
     </build>
+
 </project>
