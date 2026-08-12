@@ -36,6 +36,8 @@
             <groupId>com.javarush</groupId>
             <artifactId>desktop-game-engine</artifactId>
             <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/desktop-game-engine.jar</systemPath>
         </dependency>
 
         <!-- JUnit -->
@@ -49,11 +51,6 @@
     </dependencies>
 
     <build>
-
-        <!--
-            Копируем собранные зависимости как ресурсы.
-            В результате они попадут внутрь JAR в папку lib/
-        -->
         <resources>
             <resource>
                 <directory>${project.build.outputDirectory}</directory>
@@ -65,10 +62,6 @@
 
         <plugins>
 
-            <!--
-                Maven Compiler Plugin.
-                По условию задания оставляем без изменений.
-            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -78,29 +71,19 @@
                 </configuration>
             </plugin>
 
-            <!--
-                Устанавливаем desktop-game-engine-1.0.jar
-                из папки lib в локальный Maven repository.
-            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-install-plugin</artifactId>
                 <version>3.1.0</version>
-
                 <executions>
                     <execution>
                         <id>install-desktop-game-engine</id>
                         <phase>initialize</phase>
-
                         <goals>
                             <goal>install-file</goal>
                         </goals>
-
                         <configuration>
-                            <file>
-                                ${project.basedir}/lib/desktop-game-engine-1.0.jar
-                            </file>
-
+                            <file>${project.basedir}/lib/desktop-game-engine.jar</file>
                             <groupId>com.javarush</groupId>
                             <artifactId>desktop-game-engine</artifactId>
                             <version>1.0</version>
@@ -110,9 +93,6 @@
                 </executions>
             </plugin>
 
-            <!--
-                Копируем compile-зависимости в target/classes/lib.
-            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -138,18 +118,6 @@
                 </executions>
             </plugin>
 
-            <!--
-                Создаём исполняемый JAR.
-
-                Main-Class:
-                специальный загрузчик JavaRush.
-
-                Rsrc-Main-Class:
-                настоящий стартовый класс игры.
-
-                Class-Path:
-                зависимости находятся внутри JAR в папке lib/.
-            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -166,7 +134,7 @@
 
                         <manifestEntries>
                             <Class-Path>
-                                ./ lib/commons-lang3-3.12.0.jar lib/desktop-game-engine-1.0.jar lib/javafx-base-18.0.1-mac.jar lib/javafx-controls-18.0.1-mac.jar lib/javafx-graphics-18.0.1-mac.jar
+                                ./ lib/commons-lang3-3.12.0.jar lib/desktop-game-engine.jar lib/javafx-base-18.0.1-mac.jar lib/javafx-controls-18.0.1-mac.jar lib/javafx-graphics-18.0.1-mac.jar
                             </Class-Path>
 
                             <Rsrc-Main-Class>
@@ -177,10 +145,6 @@
                 </configuration>
             </plugin>
 
-            <!--
-                Не запускаем StrangeTest.
-                Все остальные тесты запускаются.
-            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -193,10 +157,6 @@
                 </configuration>
             </plugin>
 
-            <!--
-                Позволяет запускать игру через:
-                mvn javafx:run
-            -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
